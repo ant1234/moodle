@@ -21,7 +21,9 @@ namespace core_reportbuilder\local\report;
 use coding_exception;
 use context;
 use lang_string;
+use html_writer;
 use core_reportbuilder\local\entities\base as entity_base;
+use core_reportbuilder\local\report\column;
 use core_reportbuilder\local\filters\base as filter_base;
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\helpers\user_filter_manager;
@@ -629,6 +631,18 @@ abstract class base {
     }
 
     /**
+     * Adds bulk action button to report.
+     *
+     * @param array $actionparams paramters for action button.
+     * @param bool  $addbutton indicates whether to use bulk actions or not.
+     * @return void
+     */
+    public function add_action_button(array $actionparams, bool $addbutton = false): void {
+        $this->actionparams = $actionparams;
+        $this->addbutton = $addbutton;
+    }
+
+    /**
      * Set if the report can be downloaded.
      *
      * @param bool $downloadable
@@ -646,6 +660,34 @@ abstract class base {
      */
     final public function is_downloadable(): bool {
         return $this->downloadable;
+    }
+
+    /**
+     * Attach checkbox field for bulk actions to report.
+     *
+     * @param bool $selectable switches the feature on.
+     * @param object $entity data entity.
+     * @param string $tablealias table alias.
+     *
+     * @return object $column.
+     */
+    public static function is_selectable($selectable, $entity, $tablealias): object {
+        $column = (new column(
+            'id',
+            new lang_string('checkbox', 'core_reportbuilder'),
+            $entity->get_entity_name()
+        ))
+            ->set_is_sortable(false)
+            ->add_field("$tablealias.id")
+            ->add_callback(static function ($value): string {
+                return html_writer::empty_tag('input', array('type' => 'checkbox',
+                                                             'name' => 'checkbox',
+                                                             'value' => 1,
+                                                             'class' => 'reportcheckbox',
+                                                             'data-id' => $value,
+                                                            ));
+            });
+        return $column;
     }
 
     /**

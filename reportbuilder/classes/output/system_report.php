@@ -50,11 +50,16 @@ class system_report implements renderable, templatable {
      * @param report $report
      * @param base $source
      * @param array $parameters
+     * @param array $actionparams
+     * @param bool $addbutton
      */
-    public function __construct(report $report, base $source, array $parameters) {
+    public function __construct(report $report, base $source, array $parameters, array $actionparams = [],
+                                bool $addbutton = false)) {
         $this->report = $report;
         $this->source = $source;
         $this->parameters = $parameters;
+        $this->actionparams = $actionparams;
+        $this->addbutton = $addbutton;
     }
 
     /**
@@ -64,10 +69,24 @@ class system_report implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $exporter = new system_report_exporter($this->report, [
+        $params = [
             'source' => $this->source,
             'parameters' => json_encode($this->parameters),
-        ]);
+        ];
+
+        if (!empty($this->actionparams)) {
+            if ($this->addbutton) {
+                $params['formaction'] = $this->actionparams['formaction'];
+                $params['buttonvalue'] = $this->actionparams['buttonvalue'];
+                $params['buttonid'] = $this->actionparams['buttonid'];
+            } else {
+                $params['formaction'] = '';
+                $params['buttonvalue'] = '';
+                $params['buttonid'] = '';
+            }
+        }
+
+        $exporter = new system_report_exporter($this->report, $params);
 
         return $exporter->export($output);
     }

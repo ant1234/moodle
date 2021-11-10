@@ -54,6 +54,9 @@ class system_report_exporter extends persistent_exporter {
         return [
             'source' => base::class,
             'parameters' => 'string',
+            'formaction' => 'string?',
+            'buttonvalue' => 'string?',
+            'buttonid' => 'string?',
         ];
     }
 
@@ -66,6 +69,9 @@ class system_report_exporter extends persistent_exporter {
         return [
             'table' => ['type' => PARAM_RAW],
             'parameters' => ['type' => PARAM_RAW],
+            'formaction' => ['type' => PARAM_TEXT],
+            'buttonvalue' => ['type' => PARAM_TEXT],
+            'buttonid' => ['type' => PARAM_TEXT],
             'filterspresent' => ['type' => PARAM_BOOL],
             'filtersapplied' => ['type' => PARAM_INT],
             'filtersform' => [
@@ -106,12 +112,15 @@ class system_report_exporter extends persistent_exporter {
             $filtersform->set_data_for_dynamic_submission();
         }
 
-        return [
+        $params = [
             'table' => $output->render($table),
             'parameters' => $this->related['parameters'],
             'filterspresent' => $filterspresent,
-            'filtersapplied' => $source->get_applied_filter_count(),
             'filtersform' => $filterspresent ? $filtersform->render() : '',
+            'formaction' => $this->related['formaction'],
+            'buttonvalue' => $this->related['buttonvalue'],
+            'buttonid' => $this->related['buttonid'],
         ];
+        return $params;
     }
 }

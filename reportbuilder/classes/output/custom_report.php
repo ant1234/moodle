@@ -53,14 +53,18 @@ class custom_report implements renderable, templatable {
      * @param bool $editmode
      * @param bool $showeditbutton
      * @param string $download
+     * @param array $actionparams
+     * @param bool $addbutton
      */
     public function __construct(report $reportpersistent, bool $editmode = true, bool $showeditbutton = true,
-            string $download = '') {
+            string $download = '', array $actionparams = [], bool $addbutton = false) {
 
         $this->persistent = $reportpersistent;
         $this->editmode = $editmode;
         $this->showeditbutton = $showeditbutton;
         $this->download = $download;
+        $this->actionparams = $actionparams;
+        $this->addbutton = $addbutton;
     }
 
     /**
@@ -70,7 +74,20 @@ class custom_report implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $exporter = new custom_report_exporter($this->persistent, [], $this->editmode, $this->showeditbutton, $this->download);
+
+        $params['formaction'] = '';
+        $params['buttonvalue'] = '';
+        $params['buttonid'] = '';
+
+        if (!empty($this->actionparams)) {
+            if ($this->addbutton) {
+                $params['formaction'] = $this->actionparams['formaction'];
+                $params['buttonvalue'] = $this->actionparams['buttonvalue'];
+                $params['buttonid'] = $this->actionparams['buttonid'];
+            }
+        }
+
+        $exporter = new custom_report_exporter($this->persistent, [], $this->editmode, $this->showeditbutton, $this->download, $params);
 
         return $exporter->export($output);
     }

@@ -24,6 +24,9 @@
         "id": 1,
         "source": "some\\class\\name",
         "parameters": [],
+        "formaction": "",
+        "buttonvalue": "",
+        "buttonid": "",
         "table": "table",
         "filterspresent": true,
         "filtersform": "form"
@@ -41,13 +44,70 @@
                 {{/filterspresent}}
                 <!-- Table -->
                 <div class="mt-2">
+                {{#formaction}}
+                    <input type="checkbox" id="select-all" name="select-all" style="margin:11px;">
+                    <span>Select all</span>
+                    <form action="{{formaction}}" method="post" id="bulk-action">
+                {{/formaction}}
                     {{{table}}}
+                {{#formaction}}
+                    </form>
+                {{/formaction}}
+                {{#buttonvalue}}
+                    <input
+                    type="submit"
+                    style="margin:10px 0px 0px 0px;"
+                    id="{{buttonid}}"
+                    class="btn btn-secondary"
+                    value="{{buttonvalue}}"
+                    >
+                {{/buttonvalue}}
                 </div>
             </div>
 </div>
 
 {{#js}}
-    require(['core_reportbuilder/report'], function(report) {
+    require(['core_reportbuilder/report', 'jquery', 'jqueryui', 'core/ajax'], function(report, $, bootstrap, ajax) {
+
         report.init();
+        $(document).ready(function() {
+
+            // Bulk action.
+            $('#{{buttonid}}').on('click', function() {
+                bulkaction();
+            });
+
+            // Select all checkboxes.
+            $('#select-all').on('click', function() {
+                if(this.checked) {
+                    $(':checkbox').each(function() {
+                        this.checked = true;                 
+                    });
+                } else {
+                    $(':checkbox').each(function() {
+                        this.checked = false;           
+                    });
+                }
+            });
+
+            function bulkaction() {
+                var url = '';
+                var checkboxes = []
+                $('.reportcheckbox:checkbox:checked').each(function () {
+                    checkboxes.push((this.checked ? $(this).data('id') : ""));
+                });
+                if(checkboxes.length == 1) {
+                    url = '{{formaction}}?{{buttonid}}=1' + '&id[]=' + checkboxes[0];
+                    window.open(url, '_self');
+                } else if(checkboxes.length >= 1){
+                    url = '{{formaction}}?{{buttonid}}=1' + '&id[]=' + checkboxes[0];
+                    for (let i = 1; i < checkboxes.length; i++) {
+                        url += '&id[]=' + checkboxes[i];
+                    }
+                    window.open(url, '_self');
+                }
+            }
+
+        });
     });
 {{/js}}
