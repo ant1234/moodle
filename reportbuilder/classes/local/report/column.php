@@ -120,7 +120,7 @@ final class column {
      *      this value should be the result of calling {@see get_entity_name}, however if creating columns inside reports directly
      *      it should be the name of the entity as passed to {@see \core_reportbuilder\local\report\base::annotate_entity}
      */
-    public function __construct(string $name, ?lang_string $title, string $entityname) {
+    public function __construct(string $name, $title, string $entityname) {
         $this->columnname = $name;
         $this->columntitle = $title;
         $this->entityname = $entityname;

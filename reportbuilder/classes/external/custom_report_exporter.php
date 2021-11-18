@@ -56,11 +56,15 @@ class custom_report_exporter extends persistent_exporter {
      * @param array $related
      * @param bool $editmode
      * @param string $download
+     * @param array $params
      */
-    public function __construct(persistent $persistent, array $related = [], bool $editmode = true, string $download = '') {
+    public function __construct(persistent $persistent, array $related = [], bool $editmode = true, string $download = '', array $params) {
         parent::__construct($persistent, $related);
         $this->editmode = $editmode;
         $this->download = $download;
+        $this->formaction = $params['formaction'];
+        $this->buttonvalue = $params['buttonvalue'];
+        $this->buttonid = $params['buttonid'];
     }
     /**
      * Return the name of the class we are exporting
@@ -102,6 +106,9 @@ class custom_report_exporter extends persistent_exporter {
             ],
             'editmode' => ['type' => PARAM_INT],
             'javascript' => ['type' => PARAM_RAW],
+            'formaction' => ['type' => PARAM_TEXT],
+            'buttonvalue' => ['type' => PARAM_TEXT],
+            'buttonid' => ['type' => PARAM_TEXT],
         ];
     }
 
@@ -164,6 +171,9 @@ class custom_report_exporter extends persistent_exporter {
             'filtersform' => $filtersform,
             'editmode' => (int)$this->editmode,
             'javascript' => '',
+            'formaction' => $this->formaction,
+            'buttonvalue' => $this->buttonvalue,
+            'buttonid' => $this->buttonid,
         ];
     }
 

@@ -21,6 +21,8 @@ namespace core_reportbuilder\local\report;
 use coding_exception;
 use context;
 use lang_string;
+use html_writer;
+use core_reportbuilder\local\report\column;
 use core_reportbuilder\local\entities\base as entity_base;
 use core_reportbuilder\local\filters\base as filter_base;
 use core_reportbuilder\local\helpers\database;
@@ -651,6 +653,56 @@ abstract class base {
         });
 
         return count($applied);
+    }
+
+    /**
+     * Adds bulk action button to report.
+     *
+     * @param array $actionparams paramters for action button.
+     * @param bool  $addbutton indicates whether to use bulk actions or not.
+     * @return void
+     */
+    public function add_action_button(array $actionparams, bool $addbutton = false): void {
+        $this->actionparams = $actionparams;
+        $this->addbutton = $addbutton;
+    }
+
+    /**
+     * Attach checkbox field for bulk actions to report.
+     *
+     * @param bool $selectable switches the feature on.
+     * @param object $entity data entity.
+     * @param string $tablealias table alias.
+     *
+     * @return object $column.
+     */
+    public static function is_selectable($selectable, $entity, $tablealias) {
+        global $OUTPUT;
+        $options = [
+            'id' => 'check-items',
+            'name' => 'check-items',
+            'value' => 1,
+        ];
+        $maincheckbox = new \core\output\checkbox_toggleall('items', true, $options);
+
+        $column = (new column(
+            'id',
+            $OUTPUT->render($maincheckbox),
+            $entity->get_entity_name()
+        ))
+            ->set_is_sortable(false)
+            ->add_field("$tablealias.id")
+            ->add_callback(static function ($value): string {
+                global $OUTPUT;
+                $childoptions = [
+                    'id' => 'item'.$value,
+                    'name' => 'item'.$value,
+                    'value' => $value,
+                    'classes' => 'reportcheckbox'
+                ];
+                return $OUTPUT->render(new \core\output\checkbox_toggleall('items', false, $childoptions));
+            });
+        return $column;
     }
 
     /**

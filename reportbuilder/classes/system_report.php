@@ -190,9 +190,14 @@ abstract class system_report extends base {
     final public function output(): string {
         global $PAGE;
 
+        if (!isset($this->actionparams)) {
+            $this->actionparams = [];
+            $this->addbutton = false;
+        }
+
         /** @var \core_reportbuilder\output\renderer $renderer */
         $renderer = $PAGE->get_renderer('core_reportbuilder');
-        $report = new \core_reportbuilder\output\system_report($this->get_report_persistent(), $this, $this->parameters);
+        $report = new \core_reportbuilder\output\system_report($this->get_report_persistent(), $this, $this->parameters, $this->actionparams, $this->addbutton);
 
         return $renderer->render($report);
     }

@@ -44,12 +44,52 @@
                 {{! Table }}
                 <div class="mt-2">
                     {{{table}}}
+                {{#buttonvalue}}
+                    <input
+                    type="submit"
+                    style="margin:10px 0px 0px 0px;"
+                    id="{{buttonid}}"
+                    class="btn btn-secondary"
+                    value="{{buttonvalue}}"
+                    >
+                {{/buttonvalue}}
                 </div>
             </div>
 </div>
 
 {{#js}}
-    require(['core_reportbuilder/report'], function(report) {
+    require(['core_reportbuilder/report', 'jquery', 'jqueryui', 'core/ajax'],
+    function(report, $, bootstrap, ajax) {
         report.init();
+
+        $(document).ready(function() {
+            // Bulk action.
+            $('#{{buttonid}}').on('click', function() {
+                console.log('false triggering');
+                bulkaction();
+            });
+
+            function bulkaction() {
+                var url = '';
+                var checkboxes = [];
+                $('.reportcheckbox:checkbox:checked').each(function () {
+                    var id = this.id.split('item')[1];
+                    checkboxes.push(id);
+                    checkboxes = $.unique(checkboxes);
+                });
+
+                if(checkboxes.length == 1) {
+                    url = '{{formaction}}?{{buttonid}}=1' + '&id[]=' + checkboxes[0];
+                    window.open(url, '_self');
+                } else if(checkboxes.length >= 1){
+                    url = '{{formaction}}?{{buttonid}}=1' + '&id[]=' + checkboxes[0];
+                    for (let i = 1; i < checkboxes.length; i++) {
+                        url += '&id[]=' + checkboxes[i];
+                    }
+                    window.open(url, '_self');
+                }
+            }
+        });
     });
 {{/js}}
+

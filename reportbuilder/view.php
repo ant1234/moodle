@@ -51,7 +51,22 @@ $PAGE->set_heading($reportname);
 
 echo $OUTPUT->header();
 
-$export = (new custom_report($report->get_report_persistent(), false))->export_for_template($renderer);
+$actions = !empty($report->addbutton) ? $report->actionparams : [];
+
+if ($actions) {
+    $export = (new custom_report($report->get_report_persistent(),
+                                 false,
+                                 '',
+                                 $report->actionparams,
+                                 true))->export_for_template($renderer);
+} else {
+    $export = (new custom_report($report->get_report_persistent(),
+                                 false,
+                                 '',
+                                 [],
+                                 false))->export_for_template($renderer);
+}
+
 echo $renderer->render_from_template('core_reportbuilder/report', $export);
 
 echo $OUTPUT->footer();

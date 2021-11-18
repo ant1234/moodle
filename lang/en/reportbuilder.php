@@ -193,3 +193,5 @@ $string['userfullnamewithpicturelink'] = 'Full name with picture and link';
 $string['usermodified'] = 'Modified by';
 $string['userpicture'] = 'User picture';
 $string['viewreport'] = 'View report';
+$string['checkbox'] = 'Select row';
+
